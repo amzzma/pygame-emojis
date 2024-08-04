@@ -1,7 +1,5 @@
 import pygame
 import requests
-from bs4 import BeautifulSoup
-import json
 from io import BytesIO
 from time import *
 from emoji import *
@@ -19,11 +17,8 @@ def get_emoji_name(emoji):
 def get_img(emoji):
     name_emoji = str(get_emoji_name(emoji))
     url = "https://emojiapi.dev/api/v1/"+str(name_emoji)+"/412.png"
-    print(url)
     response = requests.get(str(url))
-    print(response.status_code)
     save_data(str(emoji), response.content)
-    print("ok")
     return response.content
 
 class emojis:
@@ -46,9 +41,10 @@ class emojis:
         else:
             return None
 
-    def render_text_and_emojis(self, text, xy, font_size):
+    def render_text_and_emojis(self, text, color, xy, font_size):
         screen = self.screen
         x, y = xy
+        v, b, w = color
         parts = text.split("/e")
         font = pygame.font.Font(None, font_size)
         current_x = x
@@ -56,7 +52,7 @@ class emojis:
         for i, part in enumerate(parts):
             if part:
                 if i % 2 == 0:
-                    text_surface = font.render(part, True, (0, 0, 0))
+                    text_surface = font.render(part, True, (v, b, w))
                     text_rect = text_surface.get_rect()
                     screen.blit(text_surface, (current_x, y))
                     current_x += text_surface.get_width()
@@ -67,5 +63,5 @@ class emojis:
                     current_x += scaled_emoji.get_width()
 
         if parts[-1]:
-            text_surface = font.render(parts[-1], True, (0, 0, 0))
+            text_surface = font.render(parts[-1], True, (v, b, w))
             screen.blit(text_surface, (current_x, y))
