@@ -3,6 +3,7 @@ import requests
 from io import BytesIO
 from time import *
 from emoji import *
+import re
 
 memory = {}
 
@@ -48,9 +49,13 @@ class emojis:
         parts = text.split("/e")
         font = pygame.font.Font(None, font_size)
         current_x = x
+        byte_pattern = re.compile(b'\xef\xb8\x8f')
 
         for i, part in enumerate(parts):
             if part:
+                if byte_pattern.search(part.encode()):
+                    part = part.encode().replace(b'\xef\xb8\x8f', b"").decode()
+
                 if i % 2 == 0:
                     text_surface = font.render(part, True, (v, b, w))
                     text_rect = text_surface.get_rect()
@@ -63,5 +68,6 @@ class emojis:
                     current_x += scaled_emoji.get_width()
 
         if parts[-1]:
-            text_surface = font.render(parts[-1], True, (v, b, w))
+            part = parts[-1].encode().replace(b'\xef\xb8\x8f', b"").decode()
+            text_surface = font.render(part, True, (v, b, w))
             screen.blit(text_surface, (current_x, y))
